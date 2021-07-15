@@ -1,0 +1,30 @@
+<modification>
+	<name>EAN Invoicing</name>
+	<version>1.0</version>
+	<author>SharksMedia A/S</author>
+	<code>ean</code>
+    
+    <file path="catalog/controller/extension/quickcheckout/payment_method.php">
+		<operation error="skip">
+			<search index="1"><![CDATA[if (isset($this->request->post['survey'])) {]]></search>
+			<add position="before"><![CDATA[if (isset($this->request->post['ean'])) {
+                $this->session->data['ean'] = $this->request->post['ean'];
+            }]]></add>
+		</operation>
+	</file>
+    
+    <file path="catalog/controller/extension/quickcheckout/confirm.php">
+		<operation error="skip">
+			<search><![CDATA[if (isset($this->session->data['payment_method']['title'])) {]]></search>
+			<add position="after"><![CDATA[if (!empty($this->session->data['payment_method']['code']) && $this->session->data['payment_method']['code'] == 'ean') {
+                $this->load->language('extension/payment/ean');
+                
+                $this->session->data['payment_method']['title'] = $this->language->get('text_title');
+                
+                if (!empty($this->session->data['ean'])) {
+                    $this->session->data['payment_method']['title'] = $this->language->get('text_title') . ' (' . $this->language->get('text_field') . ' ' . $this->session->data['ean'] . ')';
+                }
+            }]]></add>
+		</operation>
+	</file>
+</modification>
